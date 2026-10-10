@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MemeForge — Free Meme Generator with Draggable Text</title>
+<meta name="description" content="MemeForge is a free meme generator: upload a photo or pick a built-in template scene, add draggable top and bottom text, control font size and outline, and download a PNG. No signup, no watermark.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Inter',sans-serif;background:#facc15}
+.font-display{font-family:'Archivo Black',sans-serif}
+canvas{touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.hard{box-shadow:5px 5px 0 #000}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is MemeForge really free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. MemeForge is completely free with unlimited usage. There is no signup, no paywall and no watermark on your exported memes. You can create and download as many memes as you like, as often as you like, on any device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do my uploaded photos leave my device?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Everything in MemeForge runs locally in your browser. Your uploaded image is loaded into the canvas on your own device and is never sent to a server, stored in a database or shared with anyone. Close the tab and the image is gone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I move meme text around?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Click any text block on the canvas to select it, then drag it with your mouse or finger to a new position. You can also use the classic top and bottom text fields for the traditional meme layout, and add extra custom blocks for multi-panel jokes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I change the font size and outline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Select a text block and use the font size slider to make it bigger or smaller, and the outline slider to control the thick black stroke that makes meme text readable. You can also pick a text colour, toggle bold and toggle automatic uppercase."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What image formats can I upload and download?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can upload JPG, PNG, WebP and most other image formats your browser can display. MemeForge exports your finished meme as a high-quality PNG file, which keeps text edges crisp and works everywhere memes are shared."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I make a meme without uploading a photo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. MemeForge includes built-in template scenes drawn directly on the canvas, including a sunburst stage, a split-panel layout, a cat corner, a galaxy scene and a clean blank canvas. Pick one, add your text and download — no photo needed."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body id="top" class="text-black">
+<header class="sticky top-0 z-50 bg-black text-white border-b-4 border-black">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+<a href="#top" class="flex items-center gap-2"><span class="bg-yellow-400 text-black font-display px-2 py-1 rounded text-lg leading-none border-2 border-yellow-400">MF</span><span class="font-display text-xl tracking-tight">Meme<span class="text-yellow-400">Forge</span></span></a>
+<nav class="flex gap-4 text-sm font-bold"><a href="#top" class="hover:text-yellow-400">Home</a><a href="https://fixoraa.tech" class="hover:text-yellow-400">More Tools</a></nav>
+</div>
+</header>
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+<div class="flex flex-wrap items-center gap-3 mb-4">
+<h1 class="font-display text-3xl sm:text-4xl">Meme Generator</h1>
+<span class="bg-black text-yellow-400 font-bold text-xs px-3 py-1.5 rounded-full uppercase tracking-wider">Unlimited Free Usage</span>
+<span class="bg-white border-2 border-black font-bold text-xs px-3 py-1.5 rounded-full">No signup · No watermark</span>
+</div>
+<p class="font-semibold max-w-2xl mb-5">Upload a photo or pick a built-in scene, drag your text into place, tune the size and outline, then download a crisp PNG.</p>
+
+<div class="grid lg:grid-cols-[320px_1fr] gap-5 items-start">
+<section class="bg-white border-2 border-black rounded-2xl p-4 hard space-y-4 order-2 lg:order-1">
+<div>
+<label class="font-display text-sm block mb-2">1 · IMAGE</label>
+<label for="fileInput" class="block text-center bg-yellow-400 hover:bg-yellow-300 border-2 border-black font-bold rounded-xl px-3 py-2.5 cursor-pointer">Upload your photo</label>
+<input id="fileInput" type="file" accept="image/*" class="hidden">
+<p id="fileMsg" class="text-xs font-semibold text-neutral-600 mt-1.5" role="status">No photo uploaded yet — a template scene is shown.</p>
+<div class="grid grid-cols-3 gap-2 mt-3" id="tplGrid"></div>
+</div>
+<div>
+<label class="font-display text-sm block mb-2">2 · CLASSIC TEXT</label>
+<label class="text-xs font-bold" for="topText">Top text</label>
+<input id="topText" class="w-full border-2 border-black rounded-lg px-2 py-1.5 mb-2 font-semibold" placeholder="WHEN THE CODE WORKS" value="WHEN THE CODE WORKS">
+<label class="text-xs font-bold" for="botText">Bottom text</label>
+<input id="botText" class="w-full border-2 border-black rounded-lg px-2 py-1.5 font-semibold" placeholder="ON THE FIRST TRY" value="ON THE FIRST TRY">
+</div>
+<div>
+<label class="font-display text-sm block mb-2">3 · SELECTED BLOCK</label>
+<div class="flex gap-2 mb-2"><button id="addBlock" class="flex-1 bg-black text-yellow-400 font-bold rounded-lg px-2 py-2 text-sm">+ Add text block</button><button id="delBlock" class="bg-white border-2 border-black font-bold rounded-lg px-3 py-2 text-sm">Delete</button></div>
+<label class="text-xs font-bold" for="blockText">Block text</label>
+<textarea id="blockText" rows="2" class="w-full border-2 border-black rounded-lg px-2 py-1.5 font-semibold mb-2"></textarea>
+<label class="text-xs font-bold flex justify-between" for="fontSize">Font size <span id="fontSizeVal">48px</span></label>
+<input id="fontSize" type="range" min="12" max="140" value="48" class="w-full accent-black">
+<label class="text-xs font-bold flex justify-between" for="outline">Outline width <span id="outlineVal">6px</span></label>
+<input id="outline" type="range" min="0" max="20" value="6" class="w-full accent-black">
+<div class="flex items-center gap-3 mt-2 flex-wrap">
+<label class="text-xs font-bold" for="color">Colour</label><input id="color" type="color" value="#ffffff" class="w-10 h-8 border-2 border-black rounded">
+<label class="text-xs font-bold flex items-center gap-1"><input id="boldTgl" type="checkbox" checked class="accent-black"> Bold</label>
+<label class="text-xs font-bold flex items-center gap-1"><input id="upperTgl" type="checkbox" checked class="accent-black"> UPPERCASE</label>
+</div>
+<p class="text-xs text-neutral-600 font-semibold mt-2">Tip: click any text on the canvas, then drag it. <span id="selInfo"></span></p>
+</div>
+<button id="downloadBtn" class="w-full bg-black text-yellow-400 font-display rounded-xl px-4 py-3 text-lg hover:bg-neutral-800">⬇ Download PNG</button>
+<p id="dlMsg" class="text-xs font-bold text-center" role="status"></p>
+</section>
+<section class="order-1 lg:order-2 bg-black rounded-2xl p-3 hard">
+<canvas id="stage" width="800" height="600" class="w-full h-auto rounded-xl bg-white block"></canvas>
+<p class="text-yellow-400 text-xs font-bold mt-2 text-center">Drag text blocks directly on the canvas · <span id="statLine"></span></p>
+</section>
+</div>
+</main>
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+<h2 class="font-display text-2xl mb-4">Frequently Asked Questions</h2>
+<div class="space-y-3 mb-10"><details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">Is MemeForge really free to use?</summary><p class="mt-2 text-neutral-700 leading-relaxed">Yes. MemeForge is completely free with unlimited usage. There is no signup, no paywall and no watermark on your exported memes. You can create and download as many memes as you like, as often as you like, on any device.</p></details>
+<details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">Do my uploaded photos leave my device?</summary><p class="mt-2 text-neutral-700 leading-relaxed">No. Everything in MemeForge runs locally in your browser. Your uploaded image is loaded into the canvas on your own device and is never sent to a server, stored in a database or shared with anyone. Close the tab and the image is gone.</p></details>
+<details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">How do I move meme text around?</summary><p class="mt-2 text-neutral-700 leading-relaxed">Click any text block on the canvas to select it, then drag it with your mouse or finger to a new position. You can also use the classic top and bottom text fields for the traditional meme layout, and add extra custom blocks for multi-panel jokes.</p></details>
+<details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">Can I change the font size and outline?</summary><p class="mt-2 text-neutral-700 leading-relaxed">Yes. Select a text block and use the font size slider to make it bigger or smaller, and the outline slider to control the thick black stroke that makes meme text readable. You can also pick a text colour, toggle bold and toggle automatic uppercase.</p></details>
+<details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">What image formats can I upload and download?</summary><p class="mt-2 text-neutral-700 leading-relaxed">You can upload JPG, PNG, WebP and most other image formats your browser can display. MemeForge exports your finished meme as a high-quality PNG file, which keeps text edges crisp and works everywhere memes are shared.</p></details>
+<details class="bg-white border-2 border-black rounded-xl p-4 shadow-[3px_3px_0_#000]"><summary class="font-bold cursor-pointer">Can I make a meme without uploading a photo?</summary><p class="mt-2 text-neutral-700 leading-relaxed">Absolutely. MemeForge includes built-in template scenes drawn directly on the canvas, including a sunburst stage, a split-panel layout, a cat corner, a galaxy scene and a clean blank canvas. Pick one, add your text and download — no photo needed.</p></details></div>
+<article id="article" class="bg-white border-2 border-black rounded-2xl p-5 sm:p-7 hard space-y-4 leading-relaxed text-neutral-800">
+<h2 class="font-display text-2xl text-black">The Complete Guide to Making Memes with MemeForge</h2>
+<p>MemeForge is a free online meme generator built around one simple idea: making a good meme should take less than a minute, and it should never require an account, a payment, or a piece of software you have to install. You open the page, choose a picture or one of the built-in template scenes, type your joke, drag the words where they belong, and download a crisp PNG. That is the whole workflow, and every part of it happens inside your own browser.</p>
+<p>A meme, at its core, is an image paired with a short, punchy piece of text that reframes the picture. The format works because the image supplies the emotion — surprise, smugness, disbelief, triumph — while the caption supplies the specific situation the viewer recognises from their own life. The best memes feel instantly personal even though millions of people share them, and that tension between a familiar image and a fresh caption is exactly what a good generator should make easy to explore. MemeForge is designed for rapid experimentation: change a word, move the text, bump the font size, and immediately see whether the joke lands harder.</p>
+<p>The classic meme layout places one line of bold white text with a heavy black outline at the top of the image and another at the bottom. That style became standard for a practical reason: outlined Impact-style lettering stays readable over almost any photograph, whether the background is bright sky or dark shadow. MemeForge keeps that tradition front and centre with dedicated top-text and bottom-text fields, automatic uppercase styling, and an outline slider that lets you dial the stroke from a subtle edge to a thick, unmistakable border. When a caption competes with a busy background, a stronger outline is usually the single fastest fix.</p>
+<p>Not every joke fits the two-line format, though, which is why MemeForge also supports free-floating text blocks. You can add as many blocks as a joke needs, click any block on the canvas to select it, and drag it precisely where it should sit — next to a face, above an object, or stacked in a corner for a multi-panel effect. Each block has its own font size, outline width, colour, bold setting and uppercase toggle, so a quiet aside can look different from the main punchline. Draggable text turns the canvas into a small stage where timing, placement and emphasis are all under your control.</p>
+<p>If you do not have a photo handy, the built-in template scenes give you an instant starting point. These scenes are drawn directly on the canvas — a radiant sunburst stage, a dramatic split panel, a grumpy cat corner, a deep-space galaxy, a bright beach blank and a clean white canvas for total freedom. Because they are generated rather than downloaded, they load instantly, carry no licensing worries, and pair naturally with any caption. Many creators start from a blank or gradient scene when the joke is purely about the words, such as a relatable statement, a hot take, or a two-sided comparison.</p>
+<p>Uploading your own image is just as simple. Choose a photo, screenshot, pet picture, product shot or reaction image from your device and MemeForge fits it onto the editing canvas while preserving its proportions. Screenshots from group chats, stills from videos, pictures of your own pets and drawings all make excellent raw material, because personal images tend to produce the most original memes — the ones nobody else could have made. Your upload never leaves your device: the file is read locally by the browser, drawn to the canvas, and forgotten when you close the tab. There is no server upload, no account history and nothing to delete later.</p>
+<p>Typography deserves more attention than most meme tools give it. Font size controls hierarchy: the biggest line is read first and sets up the joke, while smaller lines deliver the twist. Outline width controls survival: thin outlines disappear on detailed photos, while heavy outlines can overwhelm a small caption. Colour is a rarer choice in classic memes, but a yellow, red or cyan caption can match a brand, highlight one word's worth of emphasis, or simply stand out in a crowded feed. MemeForge exposes all of these controls per block, with sensible defaults, so beginners get the classic look automatically while experienced creators can fine-tune every line.</p>
+<p>Export quality matters because memes are reshared, cropped, compressed and reposted constantly. MemeForge downloads your finished work as a PNG file, which preserves the sharp edges of outlined text far better than a heavily compressed format would. A clean original also survives the journey through messaging apps and social platforms with the joke still legible. Before downloading, it is worth zooming out and reading the meme at thumbnail size — that is how most people will first see it. If the caption cannot be read at a glance, increase the font size, strengthen the outline, or shorten the words.</p>
+<p>Writing a caption that works is a craft of compression. Strong meme text is short, specific and spoken in a recognisable voice. Specific details beat general statements: naming the exact app, chore, food or minor inconvenience makes viewers feel seen. Setup-and-punchline structure helps too, with the top text establishing a situation and the bottom text undercutting it. Reading your caption aloud is a reliable test — if you stumble, the text is probably too long. MemeForge encourages this kind of iteration because editing is instant; there is no render queue and no cost to trying five versions of the same joke.</p>
+<p>Memes also have a social life beyond humour. Teachers use them to make revision points memorable, community managers use them to announce events in a voice people actually enjoy, small businesses use them to react to trends without a design team, and friends use them as a private language of in-jokes. In each case the requirements are the same: speed, legibility, no watermark spoiling the image, and the freedom to experiment without limits. An unlimited, no-signup tool respects that context. Nobody wants to create an account to make a thirty-second joke about their cat knocking a glass off a table.</p>
+<p>Accessibility and good practice are worth a moment of thought too. High-contrast outlined text is not just a style choice; it genuinely helps people read captions on small screens and in bright light. Keeping text large, avoiding clutter behind the words, and not relying on colour alone to carry meaning all make a meme more inclusive. On the rights side, using your own photos or the built-in scenes is always safe, while popular film stills and celebrity photos are widely shared for commentary but remain someone else's work — when in doubt, especially for commercial use, choose images you own or that are clearly licensed for reuse.</p>
+<p>Finally, remember that the best meme workflow is a playful one. Keep a folder of candidate photos, save your strongest finished PNGs, and do not be afraid to remake an old joke when a better caption occurs to you a day later. MemeForge is here for all of it: the quick reaction image in a group chat, the carefully positioned multi-block masterpiece, and everything in between. Pick a scene, add your words, drag them into place, make the outline bold, and forge something worth sharing.</p>
+</article>
+</section>
+<footer class="bg-black text-white py-6 mt-4"><div class="max-w-6xl mx-auto px-4 text-center text-sm font-semibold">MemeForge — forge it, share it. Made for fast, free meme making in your browser.</div></footer>
+<script id="lib-memeforge">
+var MemeForgeLib = {
+  clamp: function (v, min, max) {
+    v = Number(v);
+    if (!isFinite(v)) return min;
+    return Math.min(max, Math.max(min, v));
+  },
+  normalizeBlock: function (b, index) {
+    b = b || {};
+    var text = typeof b.text === 'string' ? b.text : '';
+    return {
+      id: typeof b.id === 'string' && b.id ? b.id : 'block-' + (index || 0),
+      text: text.slice(0, 300),
+      x: MemeForgeLib.clamp(b.x === undefined ? 0.5 : b.x, 0, 1),
+      y: MemeForgeLib.clamp(b.y === undefined ? 0.5 : b.y, 0, 1),
+      fontSize: MemeForgeLib.clamp(b.fontSize === undefined ? 48 : b.fontSize, 12, 140),
+      outline: MemeForgeLib.clamp(b.outline === undefined ? 6 : b.outline, 0, 20),
+      color: typeof b.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(b.color) ? b.color : '#ffffff',
+      uppercase: b.uppercase !== false,
+      bold: b.bold !== false
+    };
+  },
+  displayText: function (block) {
+    var t = (block && block.text) || '';
+    return block && block.uppercase ? t.toUpperCase() : t;
+  },
+  wrapLines: function (text, maxChars) {
+    maxChars = Math.max(4, Math.floor(maxChars) || 18);
+    var out = [];
+    String(text || '').split('\n').forEach(function (para) {
+      var words = para.split(/\s+/).filter(Boolean);
+      if (!words.length) { out.push(''); return; }
+      var line = '';
+      words.forEach(function (w) {
+        while (w.length > maxChars) {
+          if (line) { out.push(line); line = ''; }
+          out.push(w.slice(0, maxChars));
+          w = w.slice(maxChars);
+        }
+        var cand = line ? line + ' ' + w : w;
+        if (cand.length <= maxChars) line = cand;
+        else { out.push(line); line = w; }
+      });
+      if (line) out.push(line);
+    });
+    return out;
+  },
+  maxCharsForWidth: function (canvasWidth, fontSize) {
+    var w = Number(canvasWidth) || 800;
+    var fs = MemeForgeLib.clamp(fontSize || 48, 12, 140);
+    var charW = fs * 0.62;
+    return Math.max(4, Math.floor((w * 0.92) / charW));
+  },
+  linesForBlock: function (block, canvasWidth) {
+    var b = MemeForgeLib.normalizeBlock(block);
+    var txt = MemeForgeLib.displayText(b);
+    return MemeForgeLib.wrapLines(txt, MemeForgeLib.maxCharsForWidth(canvasWidth, b.fontSize));
+  },
+  hitTest: function (block, px, py, canvasWidth, canvasHeight) {
+    var b = MemeForgeLib.normalizeBlock(block);
+    var lines = MemeForgeLib.linesForBlock(b, canvasWidth);
+    var longest = lines.reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+    var w = longest * b.fontSize * 0.62;
+    var h = Math.max(1, lines.length) * b.fontSize * 1.15;
+    var cx = b.x * canvasWidth, cy = b.y * canvasHeight;
+    return Math.abs(px - cx) <= w / 2 + 10 && Math.abs(py - cy) <= h / 2 + 10;
+  },
+  moveBlock: function (block, dxRatio, dyRatio) {
+    var b = MemeForgeLib.normalizeBlock(block);
+    b.x = MemeForgeLib.clamp(b.x + (Number(dxRatio) || 0), 0.02, 0.98);
+    b.y = MemeForgeLib.clamp(b.y + (Number(dyRatio) || 0), 0.02, 0.98);
+    return b;
+  },
+  templates: function () {
+    return [
+      { id: 'sunburst', name: 'Sunburst Stage', bg: '#facc15' },
+      { id: 'split', name: 'Hot Take Split', bg: '#111111' },
+      { id: 'cat', name: 'Grumpy Cat Corner', bg: '#fef3c7' },
+      { id: 'stage', name: 'Big Brain Galaxy', bg: '#1e1b4b' },
+      { id: 'beach', name: 'Beach Day Blank', bg: '#7dd3fc' },
+      { id: 'blank', name: 'Clean Blank Canvas', bg: '#ffffff' }
+    ];
+  },
+  isValidTemplate: function (id) {
+    return MemeForgeLib.templates().some(function (t) { return t.id === id; });
+  },
+  exportName: function (name) {
+    var s = String(name || 'meme').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return (s || 'meme') + '.png';
+  },
+  countTextBlocks: function (blocks) {
+    if (!Array.isArray(blocks)) return 0;
+    return blocks.filter(function (b) { return b && typeof b.text === 'string' && b.text.trim().length > 0; }).length;
+  }
+};
+if (typeof module !== 'undefined' && module.exports) { module.exports = MemeForgeLib; }
+
+</script>
+<script>
+var L = MemeForgeLib;
+var canvas = document.getElementById('stage');
+var ctx = canvas.getContext('2d');
+var img = null, templateId = 'sunburst';
+var blocks = [
+  L.normalizeBlock({id:'top', text:'WHEN THE CODE WORKS', x:0.5, y:0.09, fontSize:52, outline:7},0),
+  L.normalizeBlock({id:'bottom', text:'ON THE FIRST TRY', x:0.5, y:0.91, fontSize:52, outline:7},1)
+];
+var selectedId = 'top', uid = 2, drag = null;
+
+function drawTemplate(id){
+  var w=canvas.width,h=canvas.height;
+  if(id==='sunburst'){ ctx.fillStyle='#facc15'; ctx.fillRect(0,0,w,h); ctx.save(); ctx.translate(w/2,h/2); ctx.fillStyle='#fde047'; for(var i=0;i<12;i++){ ctx.rotate(Math.PI/6); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-60,-700); ctx.lineTo(60,-700); ctx.closePath(); ctx.fill(); } ctx.restore(); ctx.font='160px serif'; ctx.textAlign='center'; ctx.fillText('😲', w/2, h/2+60); }
+  else if(id==='split'){ ctx.fillStyle='#fef9c3'; ctx.fillRect(0,0,w,h/2); ctx.fillStyle='#111111'; ctx.fillRect(0,h/2,w,h/2); ctx.font='130px serif'; ctx.textAlign='center'; ctx.fillText('🙅', w/4, h/4+45); ctx.fillText('🤩', w*0.75, h/4+45); ctx.fillStyle='#fff'; ctx.fillText('👎', w/4, h*0.75+45); ctx.fillText('🔥', w*0.75, h*0.75+45); }
+  else if(id==='cat'){ ctx.fillStyle='#fef3c7'; ctx.fillRect(0,0,w,h); ctx.fillStyle='#f59e0b'; ctx.beginPath(); ctx.arc(w/2,h*0.58,150,0,7); ctx.fill(); ctx.font='90px serif'; ctx.textAlign='center'; ctx.fillText('🐱', w/2, h*0.58+35); ctx.fillStyle='#78350f'; ctx.font='bold 34px Inter,sans-serif'; ctx.fillText('— the corner of judgement —', w/2, h*0.2); }
+  else if(id==='stage'){ var g=ctx.createLinearGradient(0,0,w,h); g.addColorStop(0,'#1e1b4b'); g.addColorStop(1,'#7c3aed'); ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.fillStyle='#fff'; for(var s=0;s<70;s++){ ctx.fillRect((s*137)%w,(s*89)%h,3,3); } ctx.font='150px serif'; ctx.textAlign='center'; ctx.fillText('🧠', w/2, h/2+55); }
+  else if(id==='beach'){ ctx.fillStyle='#7dd3fc'; ctx.fillRect(0,0,w,h*0.65); ctx.fillStyle='#fde68a'; ctx.fillRect(0,h*0.65,w,h*0.35); ctx.fillStyle='#facc15'; ctx.beginPath(); ctx.arc(w-110,100,55,0,7); ctx.fill(); ctx.font='110px serif'; ctx.textAlign='center'; ctx.fillText('🏖️', w/2, h*0.55); }
+  else { ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#e5e5e5'; for(var x=0;x<w;x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); } for(var y=0;y<h;y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } }
+}
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(img){ ctx.drawImage(img,0,0,canvas.width,canvas.height); } else { drawTemplate(templateId); }
+  blocks.forEach(function(b){
+    var nb=L.normalizeBlock(b); var lines=L.linesForBlock(nb, canvas.width);
+    ctx.font=(nb.bold?'900 ':'')+nb.fontSize+'px "Archivo Black", Impact, sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    var lh=nb.fontSize*1.15, startY=nb.y*canvas.height-((lines.length-1)*lh)/2;
+    lines.forEach(function(line,i){ var y=startY+i*lh; if(nb.outline>0){ ctx.lineWidth=nb.outline*2; ctx.strokeStyle='#000'; ctx.lineJoin='round'; ctx.strokeText(line, nb.x*canvas.width, y); } ctx.fillStyle=nb.color; ctx.fillText(line, nb.x*canvas.width, y); });
+    if(nb.id===selectedId){ ctx.save(); ctx.strokeStyle='#facc15'; ctx.lineWidth=3; ctx.setLineDash([8,6]); var longest=lines.reduce(function(m,l){return Math.max(m,l.length);},0); var bw=longest*nb.fontSize*0.62+24, bh=Math.max(1,lines.length)*lh+16; ctx.strokeRect(nb.x*canvas.width-bw/2, nb.y*canvas.height-bh/2, bw, bh); ctx.restore(); }
+  });
+  document.getElementById('statLine').textContent = L.countTextBlocks(blocks)+' text block(s) with words · '+canvas.width+'×'+canvas.height+'px';
+  document.getElementById('selInfo').textContent='Selected: '+selectedId;
+}
+function sel(){ return blocks.find(function(b){return b.id===selectedId;}) || blocks[0]; }
+function syncPanel(){ var b=sel(); if(!b) return; document.getElementById('blockText').value=b.text; document.getElementById('fontSize').value=b.fontSize; document.getElementById('fontSizeVal').textContent=b.fontSize+'px'; document.getElementById('outline').value=b.outline; document.getElementById('outlineVal').textContent=b.outline+'px'; document.getElementById('color').value=b.color; document.getElementById('boldTgl').checked=!!b.bold; document.getElementById('upperTgl').checked=!!b.uppercase; }
+function buildTemplates(){ var grid=document.getElementById('tplGrid'); L.templates().forEach(function(t){ var btn=document.createElement('button'); btn.className='border-2 border-black rounded-lg font-bold text-[11px] px-1 py-2 hover:bg-yellow-200'; btn.style.background=t.bg; btn.style.color=(t.id==='stage'||t.id==='split')?'#111':'#000'; btn.textContent=t.name; btn.addEventListener('click',function(){ templateId=t.id; img=null; document.getElementById('fileMsg').textContent='Template selected: '+t.name+'. Upload a photo anytime to replace it.'; render(); }); grid.appendChild(btn); }); }
+function canvasPos(e){ var r=canvas.getBoundingClientRect(); return { x:(e.clientX-r.left)*(canvas.width/r.width), y:(e.clientY-r.top)*(canvas.height/r.height) }; }
+canvas.addEventListener('pointerdown',function(e){ var p=canvasPos(e); for(var i=blocks.length-1;i>=0;i--){ if(L.hitTest(blocks[i],p.x,p.y,canvas.width,canvas.height)){ selectedId=blocks[i].id; drag={id:selectedId, lx:p.x, ly:p.y}; canvas.setPointerCapture(e.pointerId); syncPanel(); render(); return; } } });
+canvas.addEventListener('pointermove',function(e){ if(!drag) return; var p=canvasPos(e); var b=sel(); var moved=L.moveBlock(b,(p.x-drag.lx)/canvas.width,(p.y-drag.ly)/canvas.height); b.x=moved.x; b.y=moved.y; drag.lx=p.x; drag.ly=p.y; render(); });
+canvas.addEventListener('pointerup',function(){ drag=null; });
+document.getElementById('fileInput').addEventListener('change',function(e){ var f=e.target.files[0]; var msg=document.getElementById('fileMsg'); if(!f){ return; } if(!/^image\//.test(f.type)){ msg.textContent='That file is not an image. Please choose a JPG, PNG or WebP file.'; return; } var url=URL.createObjectURL(f); var im=new Image(); im.onload=function(){ img=im; var ratio=im.naturalHeight/im.naturalWidth; canvas.height=Math.round(Math.min(900,Math.max(300,800*ratio))); msg.textContent='Loaded: '+f.name+' ('+im.naturalWidth+'×'+im.naturalHeight+'). Drag the text to position it.'; render(); }; im.onerror=function(){ msg.textContent='Sorry, that image could not be loaded. Try another file.'; }; im.src=url; });
+document.getElementById('topText').addEventListener('input',function(e){ var b=blocks.find(function(x){return x.id==='top';}); if(b){ b.text=e.target.value; if(selectedId==='top') syncPanel(); render(); } });
+document.getElementById('botText').addEventListener('input',function(e){ var b=blocks.find(function(x){return x.id==='bottom';}); if(b){ b.text=e.target.value; if(selectedId==='bottom') syncPanel(); render(); } });
+document.getElementById('blockText').addEventListener('input',function(e){ var b=sel(); if(b){ b.text=e.target.value; if(b.id==='top') document.getElementById('topText').value=b.text; if(b.id==='bottom') document.getElementById('botText').value=b.text; render(); } });
+document.getElementById('fontSize').addEventListener('input',function(e){ var b=sel(); if(b){ b.fontSize=+e.target.value; document.getElementById('fontSizeVal').textContent=b.fontSize+'px'; render(); } });
+document.getElementById('outline').addEventListener('input',function(e){ var b=sel(); if(b){ b.outline=+e.target.value; document.getElementById('outlineVal').textContent=b.outline+'px'; render(); } });
+document.getElementById('color').addEventListener('input',function(e){ var b=sel(); if(b){ b.color=e.target.value; render(); } });
+document.getElementById('boldTgl').addEventListener('change',function(e){ var b=sel(); if(b){ b.bold=e.target.checked; render(); } });
+document.getElementById('upperTgl').addEventListener('change',function(e){ var b=sel(); if(b){ b.uppercase=e.target.checked; render(); } });
+document.getElementById('addBlock').addEventListener('click',function(){ var nb=L.normalizeBlock({id:'block-'+(uid++), text:'NEW TEXT', x:0.5, y:0.5, fontSize:44, outline:6}, uid); blocks.push(nb); selectedId=nb.id; syncPanel(); render(); });
+document.getElementById('delBlock').addEventListener('click',function(){ if(blocks.length<=1){ document.getElementById('dlMsg').textContent='Keep at least one text block.'; return; } blocks=blocks.filter(function(b){return b.id!==selectedId;}); selectedId=blocks[0].id; syncPanel(); render(); });
+document.getElementById('downloadBtn').addEventListener('click',function(){ var keep=selectedId; selectedId='__none'; render(); var a=document.createElement('a'); a.download=L.exportName('memeforge-meme'); a.href=canvas.toDataURL('image/png'); a.click(); selectedId=keep; render(); document.getElementById('dlMsg').textContent='PNG downloaded — no watermark, ever.'; });
+buildTemplates(); syncPanel(); render();
+</script>
+</body>
+</html>
